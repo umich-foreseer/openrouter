@@ -1,12 +1,20 @@
 # Foreseer OpenRouter
 
-Shared funding for approximately ten U-M researchers. Each person has an individual capped inference key. Jimmy (`jimmyzxj`, GitHub `xingjian-zhang`) is the sole OpenRouter administrator. Calls go directly to OpenRouter; no proxy, VM, or Great Lakes setup.
+Team-funded access to model APIs for Foreseer researchers at U-M. Use your individual API key to call OpenRouter from Python and record the model, provider, and cost of your experiments.
 
-**Start with [WIKI.md](WIKI.md).** Python 3.10+, standard library only. Installation and previews make no paid inference requests.
+**New here? Start with the [researcher guide](WIKI.md).** It covers requesting access, making your first request, and planning an experiment.
 
-- `admin.py`: Jimmy-only key administration and usage exports.
-- `examples/request.py`: bounded synchronous request with explicit model/provider.
-- `examples/batch.py`: text-only Batch beta preview, submission, and status.
-- `tests/`: run `python3 -m unittest discover -s tests -v`.
+| Looking for… | Read… |
+| --- | --- |
+| Access, allowances, data use, or troubleshooting | [Researcher guide](WIKI.md) |
+| Commands for running and adapting the sample scripts | [Examples guide](examples/README.md) |
+| Key administration and billing procedures — for Jimmy | [Admin runbook](ADMIN.md) |
+| Evidence from the initial setup | [Dated rollout record](ROLLOUT.md) |
 
-Credentials and private admin state must stay outside this checkout. Researchers receive repository read access later; no invitations are included in the initial rollout.
+The examples need Python 3.10+ and use only the standard library. They preview requests by default; sending requires an explicit flag. Credentials belong outside this repository.
+
+## Repository contents
+
+- `examples/`: small synchronous and Batch scripts to adapt for research.
+- `admin.py`: Jimmy's key lifecycle and usage-reporting CLI.
+- `tests/`: mocked CLI tests; run `python3 -m unittest discover -s tests -v` from the repository root.

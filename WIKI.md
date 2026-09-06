@@ -1,125 +1,101 @@
-# Foreseer research API wiki
+# Researcher guide
 
-## Access and monthly allowances
+Use the team's OpenRouter access to run experiments with different model APIs under one funded account. Each researcher receives an individual key and spending allowance. Jimmy (`jimmyzxj`) handles access, allowance changes, and billing.
 
-Jimmy (`jimmyzxj`) administers the **Umich Foreseer** account, **Default** workspace, billing, and management credential. Researchers receive individual inference keys, not dashboard memberships. Request access from Jimmy with your U-M uniqname, GitHub username, project, intended models, and estimated monthly spending. Jimmy privately delivers the key and later grants repository read access. Never share a key between people.
+## 1. Get access
 
-Default allowance: **$100 per calendar month**, resetting at midnight UTC on the first. Jimmy can override it. Ten $100 limits permit roughly $1,000/month in inference; they do not buy credits or establish a separate shared cap. All keys consume one prepaid balance (initial rollout: $25). Requests can fail when that balance is exhausted even if your allowance remains. Funding is manual and auto-top-up stays disabled. Request increases from Jimmy before starting large experiments.
+Send Jimmy your U-M uniqname, GitHub username, project, intended models, and estimated monthly spending. You will receive a research API key privately and read access to this repository. You do not need an OpenRouter dashboard account.
 
-Run Python on your laptop or an existing internet-connected research environment. No proxy, persistent VM, Great Lakes, or Lighthouse configuration is needed.
+Your key identifies your usage. Keep it to yourself, store it outside repositories, and never include it in notebooks, issues, messages, or experiment logs. Contact Jimmy immediately if it is exposed or lost.
 
-## Receive a key and make a request
+## 2. Make your first request
 
-Use Python 3.10+. Save the privately delivered key outside all repositories, for example `~/.config/foreseer/research.key`. Use mode 700 for the directory and 600 for the file. Do not paste credentials into source code, notebooks, issues, chat, shell history, or command arguments.
+You need Python 3.10+ and internet access. Clone this repository, then run the commands below from its root. No additional Python packages are required.
+
+Save your delivered key in a private file, such as `~/.config/foreseer/research.key`. On macOS or Linux, give the directory mode 700 and the file mode 600. Load it into your shell without pasting the secret into a command:
 
 ```bash
 export OPENROUTER_API_KEY="$(cat "$HOME/.config/foreseer/research.key")"
+```
+
+Choose an exact model ID and provider routing slug from the [model catalog](https://openrouter.ai/models). Replace `MODEL_ID` and `PROVIDER_SLUG` below with those values.
+
+```bash
+# Preview the request; this does not call the API.
 python3 examples/request.py --model MODEL_ID --provider PROVIDER_SLUG
-# Review preview and current prices; --send makes one paid request:
+
+# After checking the preview and price, send one paid request.
 python3 examples/request.py --model MODEL_ID --provider PROVIDER_SLUG --send
-unset OPENROUTER_API_KEY
 ```
 
-Replace uppercase placeholders. Output is capped at 64 tokens. The synchronous example selects one provider, disables provider fallbacks, and supplies no fallback model. Unsupported parameters or provider unavailability should fail rather than silently change the experiment. It requests providers that do not collect data; account restrictions can further narrow routes.
+The example asks for a short greeting and sets a 64-token output limit. It prints the response and available usage metadata. Once you are finished, clear the shell variable with `unset OPENROUTER_API_KEY`.
 
-## Model choice, prices, and reproducibility
+See the [examples guide](examples/README.md) to understand the output or adapt the prompt.
 
-Get exact IDs from the [model catalog](https://openrouter.ai/models) or public `GET https://openrouter.ai/api/v1/models`. Check the model page for current provider endpoints and prices. Catalog `pricing.prompt` and `pricing.completion` are dollars **per token**. Estimate cost as `input_tokens × prompt_price + output_tokens × completion_price`, accounting separately for caching, reasoning, tools, and other charges. Broad access is not a guarantee that every provider supports every request.
+## 3. Choose a model and plan the cost
 
-Record requested/returned model ID, provider, parameters, UTC date, dataset version, request/generation ID, token usage, and actual cost. The synchronous example prints these response fields. If cost is missing, retrieve generation details by ID or reconcile with account activity. Never log Authorization headers. Fixed parameters do not guarantee identical outputs across model/provider updates.
+Start with the capability your experiment needs, then check the exact model's provider, supported parameters, and current price. Use explicit model IDs rather than automatic model selection. Availability and prices can change, so check again before a large run.
 
-## Text-only Batch beta
+Estimate the token cost with:
 
-Batch is **beta**. Before using it, verify **the exact model's** Batch support and current pricing using the [Batch quickstart](https://openrouter.ai/docs/batch-quickstart) and model page. Synchronous availability alone does not prove Batch support. If unclear, ask Jimmy before submitting. The flag below confirms your manual check; it is not automatic capability detection.
-
-```bash
-python3 examples/batch.py --model MODEL_ID
-# Only after verifying exact-model support and pricing; submits paid work:
-python3 examples/batch.py --model MODEL_ID --verified-support --send
-# Read status and inline results using the returned ID:
-python3 examples/batch.py --model MODEL_ID --get BATCH_ID
+```text
+estimated cost = input tokens × input price + output tokens × output price
 ```
 
-The example submits one text request, bounded to 64 output tokens, with one fixed batch-level model and no model fallback list. It does not promise provider pinning. Use synchronous requests when exact provider selection is required until the relevant Batch routing contract is verified. Record returned provider information when available. Check actual `usage.cost`; do not assume a discount.
+Keep the units consistent. For example, at hypothetical prices of $1 per million input tokens and $4 per million output tokens, 1,000 requests averaging 2,000 input and 500 output tokens would cost about $4. These are illustrative prices, not a quote for a model. Reasoning, caching, tools, and other charges can change the total.
 
-**Batch visibility is workspace-wide.** Keys in Default can list shared batches; treat batch metadata and results as team-shared material, not per-person private storage. Submit only mutually shareable research data. Requests use inline JSON at `/api/beta/batches`, not another provider's file-upload protocol. After a submission timeout, inspect the Batch list before resubmitting to avoid duplicate paid jobs.
+The public model API, `GET https://openrouter.ai/api/v1/models`, reports `pricing.prompt` and `pricing.completion` in dollars **per token**. Model pages may display prices per million tokens.
 
-## Public data and provider training
+Run a small pilot, inspect actual token usage and cost, then estimate the full run. Bound output length and concurrency in your own scripts. The sample's 64-token limit is a starting point, not a suitable setting for every experiment.
 
-This workflow is for public research data, including appropriately licensed Hugging Face datasets. Public availability does not remove license, attribution, redistribution, privacy, or dataset-specific obligations. Verify that sending data to the selected provider is permitted. Public datasets can contain personal information; the hosting platform does not guarantee classification.
+### Your allowance and the shared balance
 
-Use no-training routes by default. Training-enabled tiers require deliberate opt-in by Jimmy and the researcher after checking licensing and applicable U-M requirements. The synchronous example sets `data_collection: deny`; do not remove it casually. Verify Batch's provider/data handling separately. Approval to use a personal card does not itself approve restricted institutional data. Nonpublic institutional and sensitive data are outside this public-data workflow.
+The default allowance is **$100 per calendar month**, resetting at midnight UTC on the first. Jimmy can approve a different allowance. For an increase, send the project, model, estimated cost, and timeframe before starting the larger run.
 
-## Common errors
+Your allowance limits spending; it does not reserve funds. Everyone draws from the same prepaid account, so requests can stop when the shared balance runs out even if you have allowance left. Contact Jimmy when this happens.
 
-- **401:** missing, invalid, or revoked key. Check your environment variable, then ask Jimmy.
-- **402:** insufficient shared credits or allowance. Jimmy checks both.
-- **403:** policy/provider denial or forbidden operation. Research keys cannot administer keys.
-- **429:** reduce concurrency; use bounded backoff for clearly rejected requests.
-- **400/404:** check model ID, endpoint, parameters, and exact Batch support.
-- **5xx/timeouts:** outcome may be uncertain. Inspect activity before repeating paid work.
+Replacing a key does not renew your allowance. If a replacement still shows a reduced allowance after the next month begins, ask Jimmy to synchronize it.
 
-Stop pending work before rotating keys. Already submitted batches and in-flight calls may still generate charges after disabling access.
+## 4. Prepare data and record the experiment
 
-## Jimmy's administration commands
+This team workflow is for public research data that you are permitted to send to the chosen provider. Check dataset licenses, attribution requirements, and restrictions on processing or redistribution. A dataset being downloadable from Hugging Face does not by itself establish permission or guarantee that it contains no personal information. Nonpublic institutional and sensitive data are outside this workflow.
 
-Keep `management.key`, `state.json`, and handoff files in a private directory on Jimmy's Mac **outside this checkout**. Directory mode must be 700 and management credential mode 600. Back up state using an encrypted Jimmy-only backup: it preserves identity and cross-key spending history. Never put it in GitHub secrets, artifacts, or repository files.
+Use no-training routes by default. Training-enabled provider tiers require deliberate opt-in by you and Jimmy after reviewing the dataset terms and applicable requirements. The synchronous example requests `data_collection: deny`; review the implications before changing it. Check Batch provider data handling separately.
 
-```bash
-export FORESEER_ADMIN_DIR='/absolute/path/to/private-admin-directory'
-python3 admin.py list
-python3 admin.py onboard UNIQNAME
-python3 admin.py onboard UNIQNAME --apply
-python3 admin.py limit UNIQNAME --allowance 150
-python3 admin.py limit UNIQNAME --allowance 150 --apply
-python3 admin.py rotate UNIQNAME
-# Stop jobs, settle/cancel batches, and wait for billing to settle first:
-python3 admin.py rotate UNIQNAME --drained --apply
-python3 admin.py disable UNIQNAME
-python3 admin.py disable UNIQNAME --apply
-python3 admin.py report --output "$FORESEER_ADMIN_DIR/usage.csv"
-```
+For every experiment, save:
 
-Mutation commands preview until `--apply`. Read-only commands make authenticated API reads. Onboarding checks local state and remote identity prefixes; reruns do not create duplicate keys. The default is $100; `onboard --allowance AMOUNT` supplies an initial override. `limit` changes the stored policy. Offboarding disables access and retains history; also remove that person's GitHub read permission.
+| Record | Why it matters |
+| --- | --- |
+| Requested and returned model ID; provider | Identifies the service that actually ran the request |
+| Parameters, prompt/template version, dataset version | Describes the experimental conditions |
+| UTC date and request/generation ID | Helps trace changes and investigate failures |
+| Input/output token usage and actual cost | Supports comparison and budgeting |
 
-New secrets go only to mode-600 handoff files outside the checkout. Output contains only the filename. Jimmy delivers privately, confirms receipt, and removes the handoff copy. Nothing is sent automatically. Researchers never receive the management credential.
+The synchronous example selects one provider and disables provider fallbacks. It supplies no fallback model. An unavailable route should fail rather than silently change the experiment. Fixed settings still do not guarantee identical results across model updates or repeated calls.
 
-### Rotation and UTC rollover
+Save missing metadata separately: the example does not know your dataset version, and the provider may omit some response fields. If cost is absent, ask Jimmy to help reconcile the request ID with account activity. Never record authorization headers or API keys.
 
-Rotation disables the previous key first, then subtracts all retired keys' current-month usage from the replacement limit. A $100 user who spent $37.25 receives a $62.75 replacement cap. Further rotations keep subtracting prior-key usage. OpenRouter also enforces the active key's own usage. Cross-key billing cannot be transferred atomically while jobs are in flight, so `--drained` is required. Rerun sync after any delayed billing settles.
+## 5. Use Batch for work that can wait
 
-Normal keys reset automatically at midnight UTC on the first. **After rotation, the reduced cap persists until Jimmy runs sync after the next month begins:**
+Batch is an optional **beta**, text-only path for asynchronous experiments. Before submitting, verify support and current Batch pricing for the **exact model** using the [Batch documentation](https://openrouter.ai/docs/batch-quickstart) and model page. Synchronous availability alone does not establish Batch support. Ask Jimmy if support or data handling is unclear.
 
-```bash
-python3 admin.py sync UNIQNAME
-python3 admin.py sync UNIQNAME --apply
-```
+**Batch visibility is workspace-wide.** Treat batch metadata and results in the shared workspace as team-visible material. Submit only data that can be shared with the team.
 
-Sync reads retired-key monthly counters and restores the configured allowance once they reset. Until then, the cap is conservatively lower. There is no server or scheduled job. Include rotated users in Jimmy's first-of-month checklist. Keep retired keys; deleting them breaks attribution.
+Follow the [Batch example instructions](examples/README.md#batch-example) to preview, submit, and retrieve results. The example fixes the model but does not promise provider pinning. Use synchronous requests when selecting an exact provider is essential. Check actual cost rather than assuming a discount.
 
-### Uncertain API outcomes
+After a submission timeout, ask Jimmy to check the Batch list before resubmitting; the original job may already exist.
 
-The CLI saves a pending journal before creating a key and never retries creation automatically after a timeout/crash. Inspect OpenRouter keys and activity, then:
+## 6. Get help
 
-```bash
-python3 admin.py reconcile
-python3 admin.py reconcile --apply
-```
+Contact Jimmy for access, allowance, shared-balance, or account issues. For a script problem, include the command with secrets removed, model/provider, UTC time, request or batch ID if available, and the error message or status code. The examples deliberately hide detailed exceptions; report the information you have rather than adding logs that could expose your key.
 
-Reconciliation searches the unique attempted name, disables matching keys, and clears the journal. One-time secrets cannot be recovered. A remaining disabled identity needs rotation; if no key was created, retry onboarding only after resolving uncertainty. A temporarily absent list result does not prove a timed-out creation will never complete. PATCH failures require reading current settings before rerunning the desired update. Use one Mac; a local lock serializes administration using this state directory.
+| Symptom | What to do |
+| --- | --- |
+| 401 / authentication failure | Check that your key is loaded and has not been revoked; ask Jimmy if it persists. |
+| 402 / insufficient funds or allowance | Ask Jimmy to check both your allowance and shared credits. |
+| 403 / denied request | Check the provider and requested operation; ask Jimmy about account restrictions. |
+| 429 / rate limit | Reduce concurrency. Use bounded backoff for requests known to have been rejected. |
+| 400 or 404 | Check the model ID, endpoint, supported parameters, and Batch support. |
+| Timeout or server error | The outcome may be uncertain. Check with Jimmy before repeating potentially paid work. |
 
-### Billing and repository access
-
-Export at month end **before** UTC counters reset. Reports are current-month snapshots, not historical billing records. They include retired-key usage. Reconcile against account activity, invoices/credit receipts, balance changes, fees, and timing differences. Credit purchases and inference consumption are separate accounting events. Jimmy retains receipts for the approved reimbursement process and adds funds manually. Keep auto-top-up off.
-
-The private repository belongs to `umich-foreseer`. Jimmy's GitHub identity `xingjian-zhang` has admin rights; existing organization owners retain inherent access. Onboard researchers later with repository **read** access only. Do not change organization-wide defaults. No invitations, credit purchases, credential deliveries, or paid test inference are included in this initial rollout.
-
-## References
-
-- [Management API keys](https://openrouter.ai/docs/guides/overview/auth/management-api-keys)
-- [Create API key](https://openrouter.ai/docs/api/api-reference/api-keys/create-a-new-api-key)
-- [Provider routing](https://openrouter.ai/docs/guides/routing/provider-selection)
-- [Batch beta](https://openrouter.ai/docs/batch-quickstart)
-- [Current models and pricing](https://openrouter.ai/models)
-
-Documentation checked September 2026. Recheck provider contracts before changing workflows.
+For planned key replacement, coordinate stopping jobs and settling batches with Jimmy. Already submitted work may still generate charges after access is disabled.
