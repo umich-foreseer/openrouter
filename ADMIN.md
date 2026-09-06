@@ -131,6 +131,16 @@ Reconcile it against account activity, unregistered keys if any, invoices, credi
 
 After the UTC reset, synchronize researchers with rotated keys and verify their effective limits. Check shared funds and resolve any pending operations before the next large experiment.
 
+## Maintain the shared model list
+
+Edit [models.json](models.json) to add or remove exact IDs, then increment `revision` and review the Git diff. Keep coverage broad across model families, affordable options, and useful research baselines. The list is shared configuration, not a ranking. Do not add wildcard routes, automatic model selection, or training-enabled tiers without the relevant review.
+
+Before committing, check new IDs against the public [OpenRouter catalog](https://openrouter.ai/api/v1/models), examine current provider/data-handling options and prices, and confirm the intended endpoint supports the model. The catalog check establishes that an ID is listed; it does not verify Batch or every provider route. Update `catalog_checked_on` only after checking the full list. Never auto-add everything from the catalog.
+
+Run `python3 -m json.tool models.json` to inspect the file and `python3 -m unittest discover -s tests -v` to check the examples. Neither command calls OpenRouter. Publish the reviewed change and tell researchers to update before new runs. Preserve the repository commit used by ongoing experiments; coordinate removals instead of silently switching their models.
+
+`request_defaults` controls the examples' initial output limit. `sync_routing` contains provider fallback and data-collection defaults; these do not apply automatically to Batch. Account-level guardrails have not been configured from this file. The existing key-management CLI remains an admin-only tool and is not required for normal inference.
+
 ## Repository permissions
 
 Jimmy's GitHub identity is `xingjian-zhang`. Give researchers repository **read** access only. Keep the repository private and leave organization-wide permissions unchanged. Existing organization owners retain their inherent access; sole OpenRouter administration does not remove that GitHub access.

@@ -18,7 +18,7 @@ Save your delivered key in a private file, such as `~/.config/foreseer/research.
 export OPENROUTER_API_KEY="$(cat "$HOME/.config/foreseer/research.key")"
 ```
 
-Choose an exact model ID and provider routing slug from the [model catalog](https://openrouter.ai/models). Replace `MODEL_ID` and `PROVIDER_SLUG` below with those values.
+Choose an exact model ID from our shared [models.json](models.json), then find its provider routing slug in the [OpenRouter catalog](https://openrouter.ai/models). Replace `MODEL_ID` and `PROVIDER_SLUG` below with those values.
 
 ```bash
 # Preview the request; this does not call the API.
@@ -33,6 +33,18 @@ The example asks for a short greeting and sets a 64-token output limit. It print
 See the [examples guide](examples/README.md) to understand the output or adapt the prompt.
 
 ## 3. Choose a model and plan the cost
+
+### One shared model list
+
+[models.json](models.json) is the team's allowed-model list. It covers a broad selection of model families, price ranges, and research baselines. Everyone uses this file; ask Jimmy to add a missing model with a brief explanation of the experiment it supports. Entries are exact IDs, with no wildcard families or automatic router. Inclusion is not a recommendation for every task or a promise of Batch support.
+
+The file also contains the examples' output limit and synchronous routing defaults. Both examples read it directly and reject models outside the list before sending a new request. When you write your own code, use the same file with your preferred OpenRouter client or direct REST calls. There is no team SDK or extra API layer. This is a team convention enforced by the examples, not an account-level restriction on independently written clients.
+
+Update your checkout before starting a new experiment. Record the Git commit and configuration `revision` with the run, and keep that version fixed during the experiment. An exact ID may still refer to a provider-updated model; record returned metadata too. Do not silently replace a retired model in an existing experiment.
+
+The shared `max_tokens` value is a small example default, not a team-wide output cap. Adapt it explicitly for your experiment and record the override. No universal temperature is set because model support differs. Keep fallback and data-handling settings explicit.
+
+### Estimate the cost
 
 Start with the capability your experiment needs, then check the exact model's provider, supported parameters, and current price. Use explicit model IDs rather than automatic model selection. Availability and prices can change, so check again before a large run.
 
