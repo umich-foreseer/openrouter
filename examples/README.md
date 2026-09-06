@@ -1,54 +1,47 @@
 # Running the examples
 
-These scripts show the smallest useful request flows to adapt for an experiment. Run them from the repository root with Python 3.10+. They use the standard library; there is no dependency-installation step.
+Use Python 3.10+ and the standard library. Follow the [researcher guide](../WIKI.md) to create a key and set `OPENROUTER_API_KEY`. Run the commands below from the repository root. Choose an available model directly from [OpenRouter](https://openrouter.ai/models); there is no local model catalog or configuration file.
 
-First follow the [researcher guide](../WIKI.md) to obtain a key, set `OPENROUTER_API_KEY`, and choose a model from [models.json](../models.json). Both scripts read this JSON directly and call OpenRouter's official REST endpoints using Python's standard library. You can use the same settings in any compatible client; there is no team client wrapper to install. Replace uppercase placeholders in commands with real values.
+Both scripts preview locally by default. Edit the prompt and output limit directly in the example for your experiment, or use your preferred compatible client.
 
 ## Synchronous example
 
 ```bash
-python3 examples/request.py --model MODEL_ID --provider PROVIDER_SLUG
+# Preview, then send one small paid request.
+python3 examples/request.py --model MODEL_ID
+python3 examples/request.py --model MODEL_ID --send
+
+# Optional: fix the provider for an experiment.
 python3 examples/request.py --model MODEL_ID --provider PROVIDER_SLUG --send
 ```
 
-| Argument | Meaning |
-| --- | --- |
-| `--model` | Required exact OpenRouter model ID |
-| `--provider` | Required provider routing slug from the model's endpoints |
-| `--send` | Send a paid request; omit to print the request body locally |
+Replace `MODEL_ID` and `PROVIDER_SLUG` with actual catalog values. By default OpenRouter chooses an eligible provider. Supplying `--provider` pins that provider and disables fallback; obtain its routing slug from the model's endpoints.
 
-The preview is JSON containing the prompt, model, provider settings and shared output limit. A sent request prints JSON with `choices`, requested and returned model/provider, timestamp, request ID, configuration revision, and `usage` when available. Missing response fields can be null.
+The example sends one greeting request with `max_tokens: 64` and `data_collection: deny`. It sends no temperature. Adapt the output limit for your task; some model routes may be unavailable under the data-handling requirement. Keep any changes consistent with the [data policy](../WIKI.md#4-prepare-data-and-record-the-experiment).
 
-To adapt it, edit `messages` in `request.py` and explicitly override output length or add supported generation parameters in the request body. `models.json` provides the common starting settings; no temperature is sent by default. Preserve explicit model/provider selection and disabled fallbacks when comparing experimental conditions. The script requests providers that do not collect data; changing that setting requires the review described in the researcher guide.
-
-The shared default bounds output at 64 tokens and makes one request. It is not a dataset runner: it does not provide concurrency control, resumable jobs, automatic retries, or a complete experiment ledger. Add dataset and prompt versions to your own records.
+Output includes the requested and returned model/provider, UTC time, request ID, available usage, and choices. Missing response fields may be null. Record dataset, prompt, parameters, and experiment code version separately. Fix model/provider choices for controlled comparisons.
 
 ## Batch example
+
+Check current exact-model Batch support, pricing, and data handling before submission. See the [Batch documentation](https://openrouter.ai/docs/batch-quickstart).
 
 ```bash
 # Preview locally.
 python3 examples/batch.py --model MODEL_ID
 
-# Submit paid work after checking exact-model support and prices.
-python3 examples/batch.py --model MODEL_ID --verified-support --send
+# Submit one paid batch.
+python3 examples/batch.py --model MODEL_ID --send
 
-# Read status/results using the ID returned by submission.
-python3 examples/batch.py --model MODEL_ID --get BATCH_ID
+# Retrieve status/results; no model argument is needed.
+python3 examples/batch.py --get BATCH_ID
 ```
 
-| Argument | Meaning |
-| --- | --- |
-| `--model` | Required for all commands; fixes the model during submission |
-| `--verified-support` | Your confirmation that you checked current support and pricing; does not perform that check |
-| `--send` | Submit the batch; cannot be combined with `--get` |
-| `--get` | Retrieve a batch by ID; does not submit another job |
+`--send` and `--get` are mutually exclusive. Retrieval requires your API key and makes a read request, not another submission. Submission prints the batch object; save its ID for retrieval. A model ID is required only for preview/submission.
 
-Submission prints the API's batch object. Save its ID. Retrieval prints status and, when available, inline results and usage. The `--model` argument remains required by this script for retrieval but does not select or validate the retrieved batch's model; the batch ID determines what is fetched. Retrieval remains possible if that model has since been removed from the team list; only new requests are checked against the list.
+The example contains one text request with `max_tokens: 64`. Edit its inline `requests` list for your experiment, using a unique `custom_id` per request. It does not pin providers, apply the synchronous example's data-collection setting, poll automatically, or retry. Check [shared visibility and Batch suitability](../WIKI.md#5-use-batch-for-work-that-can-wait) before using it.
 
-To adapt `batch.py`, edit the inline `requests` list. Give each request a unique `custom_id` and bound its output. The common output default comes from `models.json`. Record the configuration revision and repository commit alongside the returned batch ID. Keep the selected model at batch level and preserve the top-level JSON order: `endpoint`, `model`, then `requests`. This is a text-only example, not a file-upload or multimodal workflow.
+## Errors and checks
 
-The script does not pin a provider, poll automatically, or retry submissions. Review [Batch suitability and shared visibility](../WIKI.md#5-use-batch-for-work-that-can-wait) before using it. If submission times out, reconcile with Jimmy before trying again.
+HTTP failures report the status and a general error category, such as authentication, credits, policy, unavailable model, or rate limits. Raw error bodies and authorization headers are not printed. For timeouts or unexpected responses, inspect Activity or the Batch list before resubmitting; the previous attempt may have incurred charges.
 
-## Errors
-
-Both examples hide exception details to avoid exposing credentials and exit with an error message. They do not retry failed calls. See [getting help](../WIKI.md#6-get-help) for what to report. Preview commands require no key or network access and are safe for checking edits without spending credits.
+Preview commands require neither credentials nor network access. Run `python3 -m unittest discover -s tests -v` from the repository root to check previews, mocked requests, routing options, Batch retrieval, and error handling without spending credits.

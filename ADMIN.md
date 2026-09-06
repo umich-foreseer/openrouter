@@ -1,154 +1,47 @@
-# Admin runbook
+# Admin guide
 
-This guide is for Jimmy (`jimmyzxj`), the sole OpenRouter administrator for the **Umich Foreseer** account and **Default** workspace. Use it to manage individual researcher keys, preserve spending attribution, and reconcile funding.
+This guide is for administrators of **Umich Foreseer / Default Workspace**. Manage the team through OpenRouter's website. Researchers join as Members and manage their own keys; no local administration CLI is required.
 
-The [researcher guide](WIKI.md#your-allowance-and-the-shared-balance) is the authoritative statement of team allowances and permitted usage. This runbook describes how to implement that policy. Account balances and membership observations in the [rollout record](ROLLOUT.md) are historical; inspect live settings before acting.
+## Invite and assign a budget
 
-## Prepare the local admin environment
+1. Obtain the researcher's uniqname, OpenRouter email, GitHub username, project, and expected spending. Check for any previously issued keys.
+2. Explain that members can see each other's usage metadata in organization Activity, including models, costs, and request times. Arrange for the researcher to accept the invitation while you are available to assign the budget. Ask them to wait for confirmation before using the account; this request does not technically prevent spending before assignment.
+3. Invite them with the **Member** role, not the Admin role, from [Members](https://openrouter.ai/settings/organization-members).
+4. After acceptance, assign **Foreseer Member — $100/month** from [Guardrails](https://openrouter.ai/workspaces/default/guardrails) to the correct member account. Reopen the settings to verify the assignment, amount, and monthly reset.
+5. Confirm that the budget is active, then have them create a key in the organization's Default Workspace. Verify member ownership without requesting the secret. Grant repository read access and send them the [researcher guide](WIKI.md).
 
-Run the CLI on Jimmy's Mac with Python 3.10+. It uses only the standard library. Keep the following outside the checkout in a private local directory:
+Creating a Guardrail does not apply it to anyone. The prepared rule is for explicit member assignment, not the workspace default. Each member assigned the same rule receives a separate $100/month allowance across their own keys and chatroom usage. Individual key caps also apply. See [Guardrails](https://openrouter.ai/docs/guides/features/guardrails).
 
-| File or directory | Purpose |
-| --- | --- |
-| `management.key` | Management credential; never distribute it |
-| `state.json` | U-M uniqname mappings, key hashes, allowance overrides, retired-key history, and pending operations |
-| `handoff/` | Temporary copies of newly issued research keys |
+There is no team model allowlist. Keep model selection open while retaining spending and data-handling policies. The prepared rule covers OpenRouter credit spend, not external BYOK spend; review accounting separately before introducing BYOK.
 
-Use directory mode 700 and management-key mode 600. Back up state in an encrypted, Jimmy-only backup. Its history is necessary for attribution after key rotation. Never upload these files to GitHub, including secrets or Actions artifacts. Store your actual machine path and launcher instructions in a local setup note.
+For a different allowance, create or reuse a rule for that amount and assign it to that person. Do not edit a shared rule to change only one member. Each member can have at most one directly assigned Guardrail; preserve existing restrictions when replacing it, and verify current-period usage rather than assuming reassignment resets spending.
 
-From the repository root, point the CLI to the existing private directory:
+## Review usage and funding
 
-```bash
-export FORESEER_ADMIN_DIR='/absolute/path/to/private-admin-directory'
-python3 admin.py list
-```
+Use [Activity](https://openrouter.ai/activity) with a defined reporting period:
 
-Replace the path; do not create a second state directory to work around an error. `list` shows configured allowances, current-month usage, active-key limits, and disabled status for locally registered researchers. It is not an inventory of every unregistered account key.
+- **Creator**: member spending across their keys.
+- **API Key**: individual keys, including older administrator-issued keys.
+- **Model**: model costs for a selected member or key.
 
-Mutations preview unless you pass `--apply`. Previews and reports can make authenticated read-only requests. Use one Mac and one state directory; the local lock serializes processes using that directory.
+Check the assigned Guardrail for the allowance. Export Spend, Tokens, and Requests as CSV/PDF for monthly reconciliation; see [Activity Export](https://openrouter.ai/docs/cookbook/administration/activity-export). Do not add overlapping Creator and Key totals together.
 
-## Onboard a researcher
+Keep funding manual and auto-top-up disabled. Per-member budgets do not reserve credits or establish a shared account cap. Check [Credits](https://openrouter.ai/settings/credits) before large runs. Reconcile consumption against credit purchases, invoices, fees, and timing differences; retain receipts for reimbursement.
 
-1. Obtain the researcher's U-M uniqname, GitHub username, project, intended models, and expected spending.
-2. Preview the new identity and allowance, then apply it.
-3. Deliver the key through an approved private channel, confirm receipt, and remove the handoff copy.
-4. Grant repository read access and point the researcher to the usage guide.
+## Existing access and offboarding
 
-```bash
-python3 admin.py onboard UNIQNAME
-python3 admin.py onboard UNIQNAME --apply
-```
+The administrator's existing research key retains its current spending limit. The former local CLI is retired. Existing private management credentials, state, and key records remain outside this repository; keep them private and backed up. Old launcher/setup notes refer to the retired tool and should no longer be used. Do not reconstruct or delete private records merely because the code was removed.
 
-Replace `UNIQNAME` with the actual uniqname. The command uses the team default allowance. For an approved initial override, add `--allowance AMOUNT` to both preview and apply commands.
+If a future member already has an administrator-issued key, stop new requests, finish or cancel outstanding jobs, disable the old key, wait for charges to settle, and export its current-month spending. Neither a key name nor organization membership transfers ownership or old spending. For a member account with no previous usage, assign a temporary allowance equal to the approved budget minus settled legacy spending. Account for any other access before enabling use. If no allowance remains, defer activation until the next period; do not assume that a zero budget blocks access without verifying it. Restore the standard member budget manually at the start of the next UTC calendar month and reconcile delayed charges.
 
-The CLI prints only a handoff filename and writes the credential there with mode 600. It does not deliver the key or grant GitHub access. Keep one active research key per person; never share a key between researchers or distribute the management credential.
+For offboarding, disable the person's keys, coordinate outstanding work, export usage history, and remove organization and repository access. Check the platform's current removal requirements before deleting keys; preserve attribution evidence. Disabling access does not guarantee cancellation of submitted work.
 
-Onboarding checks existing local identities and remote key-name prefixes. Repeating it for a registered researcher does not create a new key. If the key has been lost or disabled, use the replacement procedure. If remote identity exists but local state is missing, restore the state rather than creating another identity.
+Keep the GitHub repository private and give researchers read access only. Existing organization owners retain their inherent GitHub permissions.
 
-## Review usage and change an allowance
+## Verification and preparation record
 
-```bash
-python3 admin.py list
-python3 admin.py limit UNIQNAME --allowance AMOUNT
-python3 admin.py limit UNIQNAME --allowance AMOUNT --apply
-```
+On 2026-09-06, **Foreseer Member — $100/month** was created and verified in Default Workspace, with no members or keys assigned. The organization retained a single Admin, the existing keys and workspace default rule were unchanged, and auto-top-up was off. No invitations or paid inference were performed. Recheck live state before onboarding.
 
-An override updates the stored allowance policy. The effective active-key cap accounts for usage on retired keys. Review the preview's proposed cap, then verify the result with `list`. Do not reset usage or create a replacement key to grant a budget increase.
+When onboarding the first researcher, verify their role, budget assignment, key ownership, and usage attribution in Activity. Checking saved settings does not establish that budget enforcement has been tested with real requests. Do not intentionally exhaust a budget to test the cap.
 
-## Replace a key
-
-For planned rotation, have the researcher stop jobs, finish or cancel batches, and wait for usage to settle. If a key is exposed, disable it immediately using the offboarding command below; settle outstanding work before issuing its replacement.
-
-```bash
-python3 admin.py rotate UNIQNAME
-python3 admin.py rotate UNIQNAME --drained --apply
-```
-
-`--drained` confirms that you have handled pending work; it does not check jobs automatically. Rotation disables the previous key first, then creates the replacement. Deliver and remove its handoff copy as for onboarding.
-
-### How the remaining allowance is preserved
-
-The replacement limit equals the configured monthly allowance minus all retired keys' current-month usage, floored at zero. If a researcher with a $100 allowance has spent $37.25, the replacement cap is $62.75. Further rotations continue to include earlier keys. OpenRouter separately enforces the active key's own spending against its cap.
-
-Billing across keys cannot be transferred atomically while requests are in flight. Already submitted work can still incur charges; rerun sync after delayed usage settles. Keep retired keys and their local history so their spending remains available for accounting.
-
-### Maintenance after the UTC month changes
-
-Ordinary keys reset automatically according to the monthly policy. A replacement key retains its reduced cap until you synchronize it after the next UTC month begins:
-
-```bash
-python3 admin.py sync UNIQNAME
-python3 admin.py sync UNIQNAME --apply
-```
-
-Sync reads retired-key monthly counters and recalculates the active cap. Once those counters reset, it restores the configured allowance. Until sync, the replacement's cap remains conservatively lower. There is no scheduled job: include every researcher with a rotated key in the first-of-month checklist. Sync does not re-enable disabled access.
-
-## Disable access and offboard
-
-```bash
-python3 admin.py disable UNIQNAME
-python3 admin.py disable UNIQNAME --apply
-python3 admin.py list
-```
-
-Disable prevents new use of the key; it does not guarantee cancellation of already submitted work. Retain the identity and key history for reporting. Remove the person's repository access separately. Do not delete retired keys needed for attribution.
-
-## Recover from an uncertain operation
-
-Creation writes a pending journal before sending the API request. A timeout or crash may leave the outcome uncertain, so the CLI blocks further mutations and never automatically retries creation.
-
-Inspect OpenRouter keys and activity, then preview reconciliation:
-
-```bash
-python3 admin.py reconcile
-```
-
-Once the provider's state is understood:
-
-```bash
-python3 admin.py reconcile --apply
-```
-
-Reconciliation searches the attempted unique key name, disables matching keys, and clears the journal. It cannot recover a one-time secret. If an identity remains with a disabled key, rotate it to issue a replacement. If no key was created, onboarding can be retried after resolving uncertainty.
-
-A temporarily absent list result does not prove a timed-out creation will never complete. If uncertainty remains, stop and investigate before clearing the journal. Do not manually erase the journal to bypass recovery.
-
-For an uncertain PATCH, read current settings and compare them with the intended change before rerunning it. Desired allowance policy is saved locally before the update, so sync can help recover an interrupted limit change. Restore missing local state from backup; avoid reconstructing spending history by guesswork.
-
-## Funding and monthly reconciliation
-
-Keep funding manual and auto-top-up disabled. Individual allowances do not reserve or replenish credits. For capacity planning, ten default allowances permit approximately $1,000/month of inference, but do not establish a separate shared cap. Check shared credits before large team runs and add funds manually as approved.
-
-At month end, export usage **before midnight UTC on the first**:
-
-```bash
-python3 admin.py report --output "$FORESEER_ADMIN_DIR/usage-YYYY-MM.csv"
-```
-
-Replace `YYYY-MM` with the reporting month. The report includes registered researchers and their retired-key usage. It is a current-month snapshot, not a historical billing database. Preserve each export outside the repository.
-
-Reconcile it against account activity, unregistered keys if any, invoices, credit receipts, balance changes, fees, and timing differences. Credit purchases and inference consumption are different accounting events. Keep receipts for the approved reimbursement process.
-
-After the UTC reset, synchronize researchers with rotated keys and verify their effective limits. Check shared funds and resolve any pending operations before the next large experiment.
-
-## Maintain the shared model list
-
-Edit [models.json](models.json) to add or remove exact IDs, then increment `revision` and review the Git diff. Keep coverage broad across model families, affordable options, and useful research baselines. The list is shared configuration, not a ranking. Do not add wildcard routes, automatic model selection, or training-enabled tiers without the relevant review.
-
-Before committing, check new IDs against the public [OpenRouter catalog](https://openrouter.ai/api/v1/models), examine current provider/data-handling options and prices, and confirm the intended endpoint supports the model. The catalog check establishes that an ID is listed; it does not verify Batch or every provider route. Update `catalog_checked_on` only after checking the full list. Never auto-add everything from the catalog.
-
-Run `python3 -m json.tool models.json` to inspect the file and `python3 -m unittest discover -s tests -v` to check the examples. Neither command calls OpenRouter. Publish the reviewed change and tell researchers to update before new runs. Preserve the repository commit used by ongoing experiments; coordinate removals instead of silently switching their models.
-
-`request_defaults` controls the examples' initial output limit. `sync_routing` contains provider fallback and data-collection defaults; these do not apply automatically to Batch. Account-level guardrails have not been configured from this file. The existing key-management CLI remains an admin-only tool and is not required for normal inference.
-
-## Repository permissions
-
-Jimmy's GitHub identity is `xingjian-zhang`. Give researchers repository **read** access only. Keep the repository private and leave organization-wide permissions unchanged. Existing organization owners retain their inherent access; sole OpenRouter administration does not remove that GitHub access.
-
-## References and checks
-
-- [Management API keys](https://openrouter.ai/docs/guides/overview/auth/management-api-keys)
-- [Create API key](https://openrouter.ai/docs/api/api-reference/api-keys/create-a-new-api-key)
-- [Historical rollout verification](ROLLOUT.md)
-
-Run mocked CLI tests from the repository root with `python3 -m unittest discover -s tests -v`. They do not create real keys or run paid inference. Inspect live settings when verifying a real administrative change.
+The [initial rollout record](ROLLOUT.md) describes the earlier setup and retired CLI; it is historical evidence, not current operating instructions. Run `python3 -m unittest discover -s tests -v` for mocked example checks. No tests call OpenRouter.

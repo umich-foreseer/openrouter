@@ -1,24 +1,18 @@
 # Foreseer OpenRouter
 
-Team-funded access to model APIs for Foreseer researchers at U-M. Use your individual API key to call OpenRouter from Python and record the model, provider, and cost of your experiments.
+Team-funded model access for Foreseer researchers at U-M. Members create their own API keys after an administrator assigns a budget to each member. The default allowance is **$100 per person per month**, across their keys and chatroom usage.
 
-**New here? Start with the [researcher guide](WIKI.md).** It covers requesting access, making your first request, and planning an experiment.
+**Start with the [researcher guide](WIKI.md).**
 
 | Looking for… | Read… |
 | --- | --- |
-| Access, allowances, data use, or troubleshooting | [Researcher guide](WIKI.md) |
-| Shared model list and request defaults | [models.json](models.json) |
-| Commands for running and adapting the sample scripts | [Examples guide](examples/README.md) |
-| Key administration and billing procedures — for Jimmy | [Admin runbook](ADMIN.md) |
-| Evidence from the initial setup | [Dated rollout record](ROLLOUT.md) |
+| Access, usage, budgets, and data handling | [Researcher guide](WIKI.md) |
+| Invitations, member budgets, and billing — for administrators | [Admin guide](ADMIN.md) |
+| Small synchronous and Batch REST examples | [Examples guide](examples/README.md) |
+| Historical setup evidence | [Initial rollout record](ROLLOUT.md) |
 
-Use the official OpenRouter REST API or your preferred compatible client. This repository supplies a shared configuration file and small direct-API examples, not a client framework.
+Choose models directly from the [OpenRouter catalog](https://openrouter.ai/models). There is no team model list or allowlist. Use official REST APIs or your preferred compatible client; the repository contains documentation and examples, not a team SDK or administration service.
 
-The examples need Python 3.10+ and use only the standard library. They preview requests by default; sending requires an explicit flag. Credentials belong outside this repository.
+The examples require Python 3.10+ and use only the standard library. They preview locally by default; `--send` makes a paid request. Keep credentials outside the repository.
 
-## Repository contents
-
-- `models.json`: the shared, explicitly reviewed model list and example defaults.
-- `examples/`: small synchronous and Batch scripts to adapt for research.
-- `admin.py`: Jimmy's key lifecycle and usage-reporting CLI.
-- `tests/`: mocked CLI tests; run `python3 -m unittest discover -s tests -v` from the repository root.
+Run tests with mocked network responses using `python3 -m unittest discover -s tests -v`. They make no network requests.
