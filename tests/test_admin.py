@@ -59,6 +59,12 @@ class Tests(unittest.TestCase):
             k['usage_monthly'] = 0
         self.obj.run('sync','researcher',apply=True)
         self.assertEqual(self.api.data['3']['limit'],100)
+    def test_missing_usage_fails_closed(self):
+        self.add()
+        del self.api.data['1']['usage_monthly']
+        with self.assertRaises(admin.SafeError):
+            self.obj.run('rotate','researcher',apply=True,drained=True)
+        self.assertEqual(self.api.posts,1)
     def test_utc(self):
         with patch('admin.datetime') as dt:
             dt.now.return_value.strftime.return_value = '2026-10'

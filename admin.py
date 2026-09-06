@@ -27,6 +27,11 @@ def money(value):
         raise SafeError('Allowance must be finite and nonnegative.')
     return float(x)
 
+def monthly_usage(key):
+    if key.get('usage_monthly') is None:
+        raise SafeError('Monthly usage is unavailable; refusing to estimate remaining allowance.')
+    return money(key['usage_monthly'])
+
 def private_path(path):
     p = Path(path).expanduser().resolve()
     if p == ROOT or ROOT in p.parents:
@@ -76,7 +81,7 @@ class Admin:
     def current(self, u):
         return self.api.call('GET', '/keys/' + u['hash'])['data']
     def cap(self, u):
-        spent = sum(Decimal(str(self.api.call('GET', '/keys/' + h)['data'].get('usage_monthly', 0) or 0)) for h in u.get('retired', []))
+        spent = sum(Decimal(str(monthly_usage(self.api.call('GET', '/keys/' + h)['data']))) for h in u.get('retired', []))
         return float(max(Decimal('0'), Decimal(str(u['allowance'])) - spent))
     def patch(self, h, body):
         self.api.call('PATCH', '/keys/' + h, body)
@@ -98,8 +103,8 @@ class Admin:
             rows = []
             for name, u in users.items():
                 key = self.current(u)
-                spent = sum(float(self.api.call('GET', '/keys/' + h)['data'].get('usage_monthly', 0) or 0) for h in u.get('retired', []))
-                rows.append({'uniqname': name, 'month_utc': month(), 'allowance': u['allowance'], 'usage_monthly': spent + float(key.get('usage_monthly', 0) or 0), 'key_limit': key.get('limit'), 'disabled': key['disabled']})
+                spent = sum(monthly_usage(self.api.call('GET', '/keys/' + h)['data']) for h in u.get('retired', []))
+                rows.append({'uniqname': name, 'month_utc': month(), 'allowance': u['allowance'], 'usage_monthly': spent + monthly_usage(key), 'key_limit': key.get('limit'), 'disabled': key['disabled']})
             return rows
         if command == 'reconcile':
             p = self.state.get('pending')
@@ -143,7 +148,7 @@ class Admin:
                 candidate = dict(u, allowance=proposed)
                 preview_cap = self.cap(candidate)
                 if command == 'rotate':
-                    preview_cap = max(0, preview_cap - float(self.current(u).get('usage_monthly', 0) or 0))
+                    preview_cap = max(0, preview_cap - monthly_usage(self.current(u)))
             return {'preview': command, 'uniqname': user, 'allowance': proposed, 'new_key_limit': preview_cap if command != 'disable' else None, 'note': 'rotation disables old key first and carries retired-key monthly spend'}
         if command == 'onboard':
             u = {'allowance': proposed, 'retired': []}
