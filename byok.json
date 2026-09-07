@@ -1,0 +1,406 @@
+{
+  "checked_on": "2026-09-07",
+  "provider": "azure",
+  "resource": "foreseer-byok-eus2",
+  "resource_group": "rg-foreseer-byok",
+  "location": "eastus2",
+  "endpoint": "https://foreseer-byok-eus2.openai.azure.com/",
+  "resource_type": "openai",
+  "openrouter_byok_configured": true,
+  "models": [
+    {
+      "model": "openai/gpt-5",
+      "azure_model": "gpt-5",
+      "version": "2025-08-07",
+      "deployment": "gpt-5",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5",
+      "azure_model": "gpt-5",
+      "version": "2025-08-07",
+      "deployment": "gpt-5-batch",
+      "sku": "GlobalBatch",
+      "capacity": 10,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false
+    },
+    {
+      "model": null,
+      "azure_model": "gpt-5-codex",
+      "version": "2025-09-15",
+      "deployment": "gpt-5-codex",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5-mini",
+      "azure_model": "gpt-5-mini",
+      "version": "2025-08-07",
+      "deployment": "gpt-5-mini",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5-nano",
+      "azure_model": "gpt-5-nano",
+      "version": "2025-08-07",
+      "deployment": "gpt-5-nano",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5-pro",
+      "azure_model": "gpt-5-pro",
+      "version": "2025-10-06",
+      "deployment": "gpt-5-pro",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5.1",
+      "azure_model": "gpt-5.1",
+      "version": "2025-11-13",
+      "deployment": "gpt-5.1",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5.1",
+      "azure_model": "gpt-5.1",
+      "version": "2025-11-13",
+      "deployment": "gpt-5.1-batch",
+      "sku": "GlobalBatch",
+      "capacity": 10,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false
+    },
+    {
+      "model": "openai/gpt-5.1-codex",
+      "azure_model": "gpt-5.1-codex",
+      "version": "2025-11-13",
+      "deployment": "gpt-5.1-codex",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.1-codex-max",
+      "azure_model": "gpt-5.1-codex-max",
+      "version": "2025-12-04",
+      "deployment": "gpt-5.1-codex-max",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5.1-codex-mini",
+      "azure_model": "gpt-5.1-codex-mini",
+      "version": "2025-11-13",
+      "deployment": "gpt-5.1-codex-mini",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.2",
+      "azure_model": "gpt-5.2",
+      "version": "2025-12-11",
+      "deployment": "gpt-5.2",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5.2-codex",
+      "azure_model": "gpt-5.2-codex",
+      "version": "2026-01-14",
+      "deployment": "gpt-5.2-codex",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5.3-codex",
+      "azure_model": "gpt-5.3-codex",
+      "version": "2026-02-24",
+      "deployment": "gpt-5.3-codex",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": true,
+      "tpm": 1000000,
+      "rpm": 10000,
+      "verified_api": "responses",
+      "verified_on": "2026-09-07"
+    },
+    {
+      "model": "openai/gpt-5.4",
+      "azure_model": "gpt-5.4",
+      "version": "2026-03-05",
+      "deployment": "gpt-5.4",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 10000
+    },
+    {
+      "model": "openai/gpt-5.4",
+      "azure_model": "gpt-5.4",
+      "version": "2026-03-05",
+      "deployment": "gpt-5.4-batch",
+      "sku": "GlobalBatch",
+      "capacity": 10,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false
+    },
+    {
+      "model": "openai/gpt-5.4-mini",
+      "azure_model": "gpt-5.4-mini",
+      "version": "2026-03-17",
+      "deployment": "gpt-5.4-mini",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": true,
+      "tpm": 1000000,
+      "rpm": 1000,
+      "verified_api": "chat/completions",
+      "verified_on": "2026-09-07"
+    },
+    {
+      "model": "openai/gpt-5.4-mini",
+      "azure_model": "gpt-5.4-mini",
+      "version": "2026-03-17",
+      "deployment": "gpt-5.4-mini-batch",
+      "sku": "GlobalBatch",
+      "capacity": 10,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "openrouter_batch_status": "azure_endpoint_unavailable"
+    },
+    {
+      "model": "openai/gpt-5.4-nano",
+      "azure_model": "gpt-5.4-nano",
+      "version": "2026-03-17",
+      "deployment": "gpt-5.4-nano",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.4-pro",
+      "azure_model": "gpt-5.4-pro",
+      "version": "2026-03-05",
+      "deployment": "gpt-5.4-pro",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.5",
+      "azure_model": "gpt-5.5",
+      "version": "2026-04-24",
+      "deployment": "gpt-5.5",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.6-luna",
+      "azure_model": "gpt-5.6-luna",
+      "version": "2026-07-09",
+      "deployment": "gpt-5.6-luna",
+      "sku": "DataZoneStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.6-sol",
+      "azure_model": "gpt-5.6-sol",
+      "version": "2026-07-09",
+      "deployment": "gpt-5.6-sol",
+      "sku": "DataZoneStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-5.6-terra",
+      "azure_model": "gpt-5.6-terra",
+      "version": "2026-07-09",
+      "deployment": "gpt-5.6-terra",
+      "sku": "DataZoneStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": false,
+      "tpm": 1000000,
+      "rpm": 1000
+    },
+    {
+      "model": "openai/gpt-6-astra",
+      "azure_model": "gpt-6-astra",
+      "version": "2026-09-03",
+      "deployment": "gpt-6-astra",
+      "sku": "GlobalStandard",
+      "capacity": 1000,
+      "azure_apis": [
+        "chat/completions",
+        "responses"
+      ],
+      "provisioning_state": "Succeeded",
+      "inference_verified": true,
+      "tpm": 1000000,
+      "rpm": 1000,
+      "verified_api": "chat/completions",
+      "verified_on": "2026-09-07"
+    }
+  ],
+  "openrouter_byok_enabled": true,
+  "openrouter_byok_id": "afb984fa-511b-4ebb-ac2f-0013662d7749",
+  "rollout_status": "enabled"
+}

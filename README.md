@@ -41,9 +41,17 @@ For one key, `GET https://openrouter.ai/api/v1/key` with your key as a Bearer to
 ## Administrator operations
 
 - **Onboard:** invite as Member in [Members](https://openrouter.ai/settings/organization-members), grant repository read access, and after acceptance assign **Foreseer Member — $100/month** in [Guardrails](https://openrouter.ai/workspaces/default/guardrails). Verify the member, amount, monthly reset, and ownership of their self-created key. A rule without assignments enforces nothing; use member assignment, not the workspace default. Coordinate acceptance: spending is technically possible before assignment.
-- **Change allowance:** assign a rule for the approved amount. Sharing a rule gives each member an independent budget; editing that rule affects everyone assigned to it. Each member can have one direct rule, so preserve any existing restrictions. Keep model access open. The current budget rule excludes external BYOK spend.
+- **Change allowance:** assign a rule for the approved amount. Sharing a rule gives each member an independent budget; editing that rule affects everyone assigned to it. Each member can have one direct rule, so preserve any existing restrictions. Keep model access open. The current budget rule includes BYOK spend at OpenRouter-equivalent prices.
 - **Fund and reconcile:** keep auto-top-up off, check [Credits](https://openrouter.ai/settings/credits) before large runs, and retain monthly Activity exports and receipts. Do not add overlapping Creator and Key totals. Individual budgets are not a shared account cap.
 - **Old keys:** administrator-issued keys keep their existing limits and are tracked by Key rather than member Creator. Before migration, settle and count their spending against the current month's allowance; do not grant a fresh full budget. Preserve private records. The old CLI is retired; its code and detailed migration notes remain in Git history.
 - **Offboard:** disable keys, handle outstanding jobs, export usage, and remove organization and repository access. Disabling keys does not cancel already submitted work.
+
+### BYOK
+
+[byok.json](byok.json) tracks Azure deployments, model/provider mappings, capacity, and verification status. Update it after deployment changes and inference tests; provisioned models may still need OpenRouter compatibility testing.
+
+Researchers use their OpenRouter keys; administrators configure the Azure credential in [BYOK settings](https://openrouter.ai/workspaces/default/byok/azure). Azure bills inference; see [OpenRouter pricing](https://openrouter.ai/pricing) for BYOK fees.
+
+Azure BYOK is enabled; the member budget rule and existing research key include BYOK spend. Include it in future member guardrails too; accounting can lag. For Azure-only runs, restrict routing to Azure and disable shared-capacity fallback. See the [setup reference](https://openrouter.ai/docs/guides/overview/auth/byok).
 
 Tests: `python3 -m unittest discover -s tests -v` (mocked; no network).
