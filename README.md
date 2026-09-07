@@ -1,6 +1,6 @@
 # Foreseer OpenRouter
 
-Shared model access for Foreseer researchers at U-M. Default budget: **$100 per member per calendar month**, resetting at midnight UTC on the first, across their own keys and chatroom usage. Everyone draws from the same prepaid balance; an allowance does not reserve credits. Choose any available model from [OpenRouter](https://openrouter.ai/models).
+Shared model access for Foreseer researchers at U-M. Choose any available model from [OpenRouter](https://openrouter.ai/models).
 
 ## Get access
 
